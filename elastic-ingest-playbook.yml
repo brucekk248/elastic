@@ -1,0 +1,96 @@
+---
+- name: setup elastic stack master nodes
+  hosts: ingest
+  vars:
+    - ansible_user: ansible
+    - ansible_password: ansibleadmin
+    - ansible_become_password: ansibleadmin
+
+  tasks:
+  - name: ensure docker is running
+    become: true
+    become_user: root
+    service:
+      name: docker
+      state: started
+
+  - name: starting elasticsearch ingest container 1
+    delegate_to: 144.144.13.69
+    become: true
+    become_user: root
+    docker_container:
+      name: es-ingest-1
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      env:
+        node.name: es-ingest-1
+        network.host: 0.0.0.0
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'ingest, data'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.13.66,144.144.13.67,144.144.13.68,144.144.13.69,144.144.13.70,144.144.144.16,144.144.144.17,144.144.144.18
+        cluster.initial_master_nodes: 144.144.13.66,144.144.13.67,144.144.13.68
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms14g -Xmx14g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.key
+      volumes:
+      - "/elasticingest:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
+  - name: starting elasticsearch ingest container 2
+    delegate_to: 144.144.13.70
+    become: true
+    become_user: root
+    docker_container:
+      name: es-ingest-2
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      env:
+        node.name: es-ingest-2
+        network.host: 144.144.13.70
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'ingest, data'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.13.66,144.144.13.67,144.144.13.68,144.144.13.69,144.144.13.70,144.144.144.16,144.144.144.17,144.144.144.18
+        cluster.initial_master_nodes: 144.144.13.66,144.144.13.67,144.144.13.68
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms14g -Xmx14g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/ingest-node/ingest-node.key
+      volumes:
+      - "/elasticingest:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+

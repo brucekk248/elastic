@@ -1,0 +1,148 @@
+---
+- name: setup elastic stack cold nodes
+  hosts: cold-nodes
+  vars:
+    - ansible_user: ansible
+    - ansible_password: ansibleadmin
+    - ansible_become_password: ansibleadmin
+
+  tasks:
+  - name: ensure docker is running
+    become: true
+    become_user: root
+    service:
+      name: docker
+      state: started
+
+  - name: starting elasticsearch cold container 1
+    delegate_to: 144.144.144.128
+    become: true
+    become_user: root
+    docker_container:
+      name: es-cold-1
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.144.128:9400:9400
+      - 144.144.144.128:9301:9301
+      env:
+        node.name: es-cold-1
+        network.host: 144.144.144.128
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'cold'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.144.126,144.144.144.127,144.144.144.128,144.144.144.129,144.144.144.120,144.144.144.16,144.144.144.17,144.144.144.18,144.144.144.128,144.144.144.129,144.144.144.120
+        cluster.initial_master_nodes: 144.144.144.126,144.144.144.127,144.144.144.128
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold1-node/elasticcold1-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold1-node/elasticcold1-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold1-node/elasticcold1-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold1-node/elasticcold1-node.key
+      volumes:
+      - "/data3/elasticcoldnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
+  - name: starting elasticsearch cold container 2
+    delegate_to: 144.144.144.129
+    become: true
+    become_user: root
+    docker_container:
+      name: es-cold-2
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.144.129:9400:9400
+      - 144.144.144.129:9301:9301
+      env:
+        node.name: es-cold-2
+        network.host: 144.144.144.129
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'cold'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.144.126,144.144.144.127,144.144.144.128,144.144.144.129,144.144.144.120,144.144.144.16,144.144.144.17,144.144.144.18,144.144.144.128,144.144.144.129,144.144.144.120
+        cluster.initial_master_nodes: 144.14445.172,144.14438.187,144.14432.195
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold2-node/elasticcold2-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold2-node/elasticcold2-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold2-node/elasticcold2-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold2-node/elasticcold2-node.key
+      volumes:
+      - "/data3/elasticcoldnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
+  - name: starting elasticsearch cold container 3
+    delegate_to: 144.144.144.120
+    become: true
+    become_user: root
+    docker_container:
+      name: es-cold-3
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.144.120:9400:9400
+      - 144.144.144.120:9301:9301
+      env:
+        node.name: es-cold-3
+        network.host: 144.144.144.120
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'cold'
+        cluster.name: myCluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.144.126,144.144.144.127,144.144.144.128,144.144.144.129,144.144.144.120,144.144.144.16,144.144.144.17,144.144.144.18,144.144.144.128,144.144.144.129,144.144.144.120
+        cluster.initial_master_nodes: 144.144.144.126,144.144.144.127,144.144.144.128
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold3-node/elasticcold3-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold3-node/elasticcold3-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticcold3-node/elasticcold3-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticcold3-node/elasticcold3-node.key
+      volumes:
+      - "/data3/elasticcoldnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+

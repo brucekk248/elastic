@@ -1,0 +1,148 @@
+---
+- name: setup elastic stack warm nodes
+  hosts: warm-nodes
+  vars:
+    - ansible_user: ansible
+    - ansible_password: ansibleadmin
+    - ansible_become_password: ansibleadmin
+
+  tasks:
+  - name: ensure docker is running
+    become: true
+    become_user: root
+    service:
+      name: docker
+      state: started
+
+  - name: starting elasticsearch warm container 1
+    delegate_to: 144.144.144.16
+    become: true
+    become_user: root
+    docker_container:
+      name: es-warm-1
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.13.75:9400:9400
+      - 144.144.13.75:9301:9301
+      env:
+        node.name: es-warm-1
+        network.host: 144.144.13.75
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'warm'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.13.66,144.144.13.67,144.144.13.68,144.144.13.69,144.144.13.70,144.144.144.16,144.144.144.17,144.144.144.18,144.144.13.77,144.144.13.76,144.144.13.75
+        cluster.initial_master_nodes: 144.144.13.66,144.144.13.67,144.144.13.68
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest1-node/elasticingest1-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest1-node/elasticingest1-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest1-node/elasticingest1-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest1-node/elasticingest1-node.key
+      volumes:
+      - "/data3/elasticwarmnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
+  - name: starting elasticsearch warm container 2
+    delegate_to: 144.144.144.17
+    become: true
+    become_user: root
+    docker_container:
+      name: es-warm-2
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.13.76:9400:9400
+      - 144.144.13.76:9301:9301
+      env:
+        node.name: es-warm-2
+        network.host: 144.144.13.76
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'warm'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.13.66,144.144.13.67,144.144.13.68,144.144.13.69,144.144.13.70,144.144.144.16,144.144.144.17,144.144.144.18,144.144.13.77,144.144.13.76,144.144.13.75
+        cluster.initial_master_nodes: 144.144.45.172,144.144.38.187,144.144.32.195
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest2-node/elasticingest2-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest2-node/elasticingest2-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest2-node/elasticingest2-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest2-node/elasticingest2-node.key
+      volumes:
+      - "/data3/elasticwarmnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
+  - name: starting elasticsearch warm container 3
+    delegate_to: 144.144.144.18
+    become: true
+    become_user: root
+    docker_container:
+      name: es-warm-3
+      image: 'docker.elastic.co/elasticsearch/elasticsearch:7.10.0'
+      ports:
+      - 144.144.13.77:9400:9400
+      - 144.144.13.77:9301:9301
+      env:
+        node.name: es-warm-3
+        network.host: 144.144.13.77
+        http.port: '9400'
+        transport.port: '9301'
+        node.roles: 'data'
+        node.attr.type: 'warm'
+        cluster.name: my-Cluster
+        path.repo: /usr/share/elasticsearch/elastic-backup
+        discovery.seed_hosts: 144.144.13.66,144.144.13.67,144.144.13.68,144.144.13.69,144.144.13.70,144.144.144.16,144.144.144.17,144.144.144.18,144.144.13.77,144.144.13.76,144.144.13.75
+        cluster.initial_master_nodes: 144.144.13.66,144.144.13.67,144.144.13.68
+        bootstrap.memory_lock: 'true'
+        ES_JAVA_OPTS: -Xms31g -Xmx31g
+        xpack.license.self_generated.type: basic
+        xpack.security.enabled: 'true'
+        xpack.security.http.ssl.enabled: 'true'
+        xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest3-node/elasticingest3-node.key
+        xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest3-node/elasticingest3-node.crt
+        xpack.security.transport.ssl.enabled: 'true'
+        xpack.security.transport.ssl.verification_mode: certificate
+        xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certificates/ca/ca.crt
+        xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certificates/elasticingest3-node/elasticingest3-node.crt
+        xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certificates/elasticingest3-node/elasticingest3-node.key
+      volumes:
+      - "/data3/elasticwarmnodes:/usr/share/elasticsearch/data"
+      - "/etc/ssl/certs/.elastic_certificates:/usr/share/elasticsearch/config/certificates"
+      - "/data4/elastic-backup:/usr/share/elasticsearch/elastic-backup"
+      ulimits:
+      - nofile:65535:65535
+      - memlock:-1:-1
+      network_mode: host
+      state: started
+
